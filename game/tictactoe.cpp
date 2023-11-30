@@ -118,7 +118,7 @@ for (int i = 0; i < 9; i++) {
 PlayerIn(board);
 if (CheckWin(board)) {
     DisplayBoard(board);
-    cout << "Contragulations: You won the game!" << endl;
+    cout << "Congratulations: You won the game!" << endl;
     break;
 }
 ComputerMove(board);
@@ -126,6 +126,10 @@ if (CheckWin(board)) {
     DisplayBoard(board);
     cout << "Computer won the game. Better luck next time." << endl;
     break;
+}
+    
+if (i == 8 && CheckWin(board) == false) {
+    cout << "Game ended in a draw. Better luck next time" << endl;
 }
 DisplayBoard(board);
 }
