@@ -2,7 +2,7 @@ import random
 
 def player_in(board):
     r = int(input("Enter row:\n")) 
-    c= int(input("Enter column:\n"))
+    c = int(input("Enter column:\n"))
 
     # check that cell is not is use
     while board[r-1][c-1] != 0:
@@ -89,7 +89,10 @@ def main():
             display_board(board)
             print("Computer won the game. Better luck next time.")
             break
-
+            
+        if i == 8 and not check_win(board):
+            print("Game ended in a draw. Better luck next time.")
+            break
         display_board(board)
 
 if __name__ == "__main__":
