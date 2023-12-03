@@ -1,5 +1,6 @@
 import socket
 import threading
+import sys
 
 class Peer:
   def __init__ (self, host, port):
@@ -17,6 +18,7 @@ class Peer:
       print(f"Failed to connect to peer at {peer_host}:{peer_port}. Error: {e}")
       
   def listen(self):
+    self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     self.socket.bind((self.host, self.port))
     self.socket.listen(5)
     print(f"Listening for connections on {self.host}:{self.port}")
@@ -25,6 +27,10 @@ class Peer:
       conn, addr = self.socket.accept()
       self.connections.append(conn)
       print(f"Accepted connection from {addr}")
+      
+      user_input = input("Do you want to exit the program? (y/n): ")
+      if user_input.lower() == "y":
+        exit_program()
       
   def broadcast(self, message):
     for conn in self.connections:
@@ -37,3 +43,11 @@ class Peer:
     listen_thread = threading.Thread(target=self.listen)
     listen_thread.start()
     
+def exit_program():
+    print("Exiting the program...")
+    sys.exit(0)
+       
+if __name__ == "__main__":
+  peer = Peer("localhost", 5000)
+  peer.start()
+  
