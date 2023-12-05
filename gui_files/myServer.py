@@ -43,6 +43,7 @@ def get_input(currentPlayer):
 
         board[x][y] = currentPlayer
         send_msg("Matrix")
+        time.sleep(0.5)
         send_msg(str(board))
     except:
         conn.send("Error".encode())
