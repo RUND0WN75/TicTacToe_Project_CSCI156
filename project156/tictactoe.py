@@ -11,9 +11,10 @@ class TicTacToe:
     self.board = [[0 for col in range(3)] for row in range(3)]
     self.players = ["X", "O"]
     self.turn = self.players[0]
-    self.you = self.players[0]
-    self.opponent = self.players[1]
+    self.player1 = self.players[0]
+    self.player2 = self.players[1]
     self.winner = None
+    self.gamePlay = None
     self.gameOver = False
     
     self.counter = 0
@@ -81,21 +82,42 @@ class TicTacToe:
           
     client.close()
   
-  def playComputer(self):
+  def playHuman(self):
     print("\nGame starting...")
+    self.gamePlay = "human"
     self.displayBoard()
     while not self.gameOver:
-      if self.turn == self.you:
+      if self.turn == self.player1:
+        move = input("PLAYER 1: Enter move (row,column): ")
+        if self.isValidMove(move.split(",")):
+          self.makeMove(move.split(","))
+          self.turn = self.player2
+        else:
+          print("Invalid move.")
+      else:
+        move = input("PLAYER 2: Enter move (row,column): ")
+        if self.isValidMove(move.split(",")):
+          self.makeMove(move.split(","))
+          self.turn = self.player1
+        else:
+          print("Invalid move.")
+  
+  def playComputer(self):
+    print("\nGame starting...")
+    self.gamePlay = "computer"
+    self.displayBoard()
+    while not self.gameOver:
+      if self.turn == self.player1:
         move = input("Enter move (row,column): ")
         if self.isValidMove(move.split(",")):
           self.makeMove(move.split(","))
-          self.turn = self.opponent
+          self.turn = self.player2
         else:
           print("Invalid move.")
       else:
         print("Computer move:")
-        self.makeMove(self.computerMove(), self.opponent)
-        self.turn = self.you
+        self.makeMove(self.computerMove())
+        self.turn = self.player1
   
   def computerMove(self):
     move = [random.randint(0, 2), random.randint(0, 2)]
@@ -115,15 +137,25 @@ class TicTacToe:
     self.displayBoard()
     
     if self.checkWinner():
-      if self.winner == self.you:
-        print("You win!")
-        self.gameOver = True
-      elif self.winner == self.opponent:
-        print("You lose!")
-        self.gameOver = True
+      if self.winner == self.player1:
+        if self.gamePlay == "computer":
+          print("You win!")
+        elif self.gamePlay == "human":
+          print("Player 1 wins!")
+        else:
+          print("Player 1 wins!")
+      elif self.winner == self.player2:
+        if self.gamePlay == "computer":
+          print("You lose!")
+        elif self.gamePlay == "human":
+          print("Player 2 wins!")
+        else:
+          print("Player 2 wins!")
+
+      self.gameOver = True
     else:
       if self.counter == 9:
-        print("Tie!")
+        print("Its a tie!")
         self.gameOver = True
           
   def isValidMove(self, move):
@@ -176,12 +208,19 @@ class Game:
     self.host = None
     self.client = None
     
-    while self.selection != "5":
+    while self.selection != "3":
       self.menuSelect()
       
   def playComputer(self):
     self.game = TicTacToe()
     self.game.playComputer()
+    
+    while not self.game.gameOver:
+      pass
+    
+  def playHuman(self):
+    self.game = TicTacToe()
+    self.game.playHuman()
     
     while not self.game.gameOver:
       pass
@@ -209,18 +248,61 @@ class Game:
       
   def menuSelect(self):
     print("\nSelect an option:")
+    print("1. Play Offline")
+    print("2. Connect to Server")
+    print("3. Quit Game")
+    
+    selection = input("\nSelection: ")
+    if selection == "1":
+      self.menuGameSelectOffline()
+    elif selection == "2":
+      self.menuGameSelectOnline()
+    elif selection == "3":
+      print("Thank you for playing TicTacToe! Goodbye.")
+      sys.exit()
+    else:
+      print("Invalid selection.")
+      self.menuSelect()
+    
+  def menuGameSelectOffline(self):
+    print("\nSelect an option:")
     print("1. Play vs. Computer")
-    print("2. Play vs. Player (P2P)")
-    print("3. Play vs. Player (Server)")
-    print("4. Play vs. Player (Client)")
-    print("5. Exit")
+    print("2. Play vs. Human")
+    print("3. Main Menu")
     
     selection = input("\nSelection: ")
     if selection == "1":
       self.playComputer()
+    elif selection == "2":
+      self.playHuman()
+    elif selection == "3":
+      self.menuSelect()
+    else:
+      print("Invalid selection.")
+      self.menuGameSelectOffline()
+  
+  def menuGameSelectOnline(self):
+    print("\nSelect an option:")
+    print("1. Play vs. Computer")
+    print("2. Play vs. Human (Online)")
+    print("3. Main Menu")
+    
+    selection = input("\nSelection: ")
+    if selection == "1":
+      self.game = TicTacToe()
+      self.game.playComputer()
       
     elif selection == "2":
-      self.playP2P()
+      self.game = TicTacToe()
+      
+      self.host = input("\nHost? (y/n): ")
+      if self.host == "y":
+        self.game.hostGame("localhost", 3333)
+      else:
+        self.game.connectGame("localhost", 3333)
+        
+      while not self.game.gameOver:
+        pass
         
     elif selection == "3":
       self.playServer()
