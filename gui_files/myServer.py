@@ -23,6 +23,7 @@ def send_board():
 def send_msg(message):
     for conn in playerConn:
         conn.send(message.encode())
+    time.sleep(1)
 
 def get_input(currentPlayer):
     if currentPlayer == playerOne:
@@ -33,7 +34,6 @@ def get_input(currentPlayer):
         conn = playerConn[1]
 
     print(player)
-
     send_msg(player)
 
     try:
@@ -45,33 +45,36 @@ def get_input(currentPlayer):
         y = int(data_decoded[1])
 
         board[x][y] = currentPlayer
-        send_board()
-        #send_common_msg("Matrix")
-        #send_common_msg(str(board))
+        #send_board()
+        send_msg("Matrix")
+        send_msg(str(board))
     except:
         conn.send("Error".encode())
         print("Error")
 
 def check_win(board):
+    winner = 0
     # check rows
     for i in range(3):
-        if board[i][0] == board[i][1] == board[i][2] != 0:
-            return True
-
-    # check columns
+       if board[i][0] == board[i][1] and board[i][1] == board[i][2]:
+            winner = board[i][0]
+            if winner != 0:
+                break
+    
+    #check columns
     for i in range(3):
-        if board[0][i] == board[1][i] == board[2][i] != 0:
-            return True
+        if board[0][i] == board[1][i] and board[1][i] == board[2][i]:
+            winner = board[0][i]
+            if winner != 0:
+                break
 
-    # check negative diagonal
-    if board[0][0] == board[1][1] == board[2][2] != 0:
-        return True
-
-    #check positive diagonal
-    if board[0][2] == board[1][1] == board[2][0] != 0:
-        return True
-
-    return False
+    #check diagonals
+    if board[0][0] == board[1][1] and board[1][1] == board[2][2]:
+        winner = board[0][0]
+    elif board[0][2] == board[1][1] and board[1][1] == board[2][0]:
+        winner = board[0][2]
+        
+    return winner
 
 def start_server():
     try:
@@ -113,44 +116,18 @@ def start_game():
     send_msg("Over")
 
     if result == 1:
-        #screen_board(board)
-        #screen_board(board, "Player 1 wins", 3000)
-        #running = False
         win_mssg = "Player 1 wins"
     elif result == 2:
-        #screen_board(board)
-        #screen_board(board, "Player 2 wins", 3000)
-        #running = False
         win_mssg = "Player 2 wins"
 
     elif all(cell != 0 for row in board for cell in row):
-        #screen_board(board)
-        #screen_board(board, "Game ended in a draw. Better luck next time.", 3000)
-        #running = False
         win_mssg = "Game ended in a draw. Better luck next time"
     else:
         win_mssg = "Error"
-        #computer_move(board)
-        #if check_win(board):
-         #   screen_board(board)
-          #  screen_board(board, "Computer won the game. Better luck next time.", 3000)
-           # running = False
-        #elif all(cell != 0 for row in board for cell in row):
-         #   screen_board(board, "Game ended in a draw. Better luck next time.", 3000)
-          #  running = False
-    #screen_board(board)
 
     send_msg(win_mssg)
     time.sleep(15)
 
     for conn in playerConn:
         conn.close()
-
-
-#def send_common_msg(message):
- #   playerConn[0].send(message.encode())
-  #  playerConn[1].send(message.encode())
-   # time.sleep(15)
-
-
 start_server()
