@@ -120,6 +120,7 @@ def start_game():
     global board
     thread_creation(msg_accept)
     
+    screen_board(board, f"You're player {currentPlayer}")
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -129,6 +130,8 @@ def start_game():
                 move = player_input(board, mouseX, mouseY)
                 if move is not None:
                     client.send(f"{move[0]},{move[1]}".encode())
+
+        
         if msg1 == "":
             break
 
@@ -140,23 +143,29 @@ def msg_accept():
     global msg2
     global allow
     while True:
-        data_received = client.recv(2048*10)
-        data_decoded = data_received.decode()
-        screen_board(board, data_decoded)
-        
+        try:
+            data_received = client.recv(2048*10)
+            data_decoded = data_received.decode()
+            
 
-        if data_decoded == "Matrix":
-            matrix_received = client.recv(2048*100)
-            matrix_received_decoded = matrix_received.decode("utf-8")
-            board = eval(matrix_received_decoded)
-        
-        elif data_decoded == "Over":
-            message_received = client.recv(2048*100)
-            message_received_decoded = message_received.decode("utf-8")
-            msg2 = message_received_decoded
-            msg1 = "Game Over"
+            if data_decoded == "Matrix":
+                matrix_received = client.recv(2048*100)
+                matrix_received_decoded = matrix_received.decode("utf-8")
+                board = eval(matrix_received_decoded)
+                screen_board(board)
+
+            elif data_decoded.startswith("Game"):
+                screen_board(board, data_decoded)
+
+            elif data_decoded == "Over":
+                msg1 = "Game Over"
+                screen_board(board, msg1)
+                break
+            else:
+                msg1 = data_decoded
+        except Exception as e:
+            print("Error", e)
             break
-        else:
-            msg1 = data_decoded
+    
 
 player_start()
