@@ -131,29 +131,7 @@ def display_board(board):
 def main():
     # board uses a 2D array implementation
     board = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
-    """"
-    print("Player is X, Computer is O")
-
-    reset_board(board)
-
-    for i in range(9):
-        player_in(board)
-
-
-        if check_win(board):
-            display_board(board)
-            print("Congratulations: You won the game!")
-            break
-
-        computer_move(board)
-
-        if check_win(board):
-            display_board(board)
-            print("Computer won the game. Better luck next time.")
-            break
-
-        display_board(board) 
-    """
+    screen_board(board)
     running = True
     while running:
         for event in pygame.event.get():
