@@ -1,6 +1,5 @@
 import socket
 import time
-import pickle
 
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 host = ""
@@ -17,20 +16,18 @@ def send_board():
     board_str = str(board)
     for conn in playerConn:
         conn.send("Matrix".encode())
-        time.sleep(1)
         conn.send(board_str.encode())
 
 def send_msg(message):
     for conn in playerConn:
         conn.send(message.encode())
-    time.sleep(1)
 
 def get_input(currentPlayer):
     if currentPlayer == playerOne:
-        player = "Player One's Turn"
+        player = "Turn of Player One"
         conn = playerConn[0]
     else:
-        player = "Player Two's Turn"
+        player = "Turn of Player Two"
         conn = playerConn[1]
 
     print(player)
@@ -45,7 +42,6 @@ def get_input(currentPlayer):
         y = int(data_decoded[1])
 
         board[x][y] = currentPlayer
-        #send_board()
         send_msg("Matrix")
         send_msg(str(board))
     except:
@@ -105,6 +101,8 @@ def accept_players():
 def start_game():
     result = 0
     i = 0
+    current_player = playerOne
+
     while result == 0 and i < 9:
         if (i%2 == 0):
             get_input(playerOne)
@@ -112,13 +110,16 @@ def start_game():
             get_input(playerTwo)
         result = check_win(board)
         i += 1
+        if current_player == playerOne:
+            current_player = playerTwo 
+        else:
+            current_player = playerOne
     
-    send_msg("Over")
 
     if result == 1:
-        win_mssg = "Player 1 wins"
+        win_mssg = "Game won by Player 1"
     elif result == 2:
-        win_mssg = "Player 2 wins"
+        win_mssg = "Game won by Player 2"
 
     elif all(cell != 0 for row in board for cell in row):
         win_mssg = "Game ended in a draw. Better luck next time"
@@ -126,8 +127,12 @@ def start_game():
         win_mssg = "Error"
 
     send_msg(win_mssg)
-    time.sleep(15)
+    time.sleep(2)
+    send_msg("Over")
+    
+    time.sleep(10)
 
     for conn in playerConn:
         conn.close()
+
 start_server()
