@@ -162,7 +162,6 @@ class Server:
         return True
       
       case "move":
-        print("move received")
         move = eval(client_request.split("::")[1])
         clientHandle = self.getClientByAddr(client_address)[2]
         activeGame = self.activeGames[clientHandle]
@@ -222,8 +221,8 @@ class Server:
         port = client_request.split("::")[1]
         if (len(self.p2pHosts) > 0):
           handle = self.getClientByAddr(client_address)[2]
-          matching_hosts = self.getP2PHostByHandle(handle)
-          if len(matching_hosts) <= 0:
+          matching_host = self.getP2PHostByHandle(handle)
+          if not matching_host:
             self.p2pHosts.append((handle, (client_address[0], port)))
         else:
           handle = self.getClientByAddr(client_address)[2]

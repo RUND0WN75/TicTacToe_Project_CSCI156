@@ -561,7 +561,6 @@ class Game:
     elif selection == "2":
       self.client.sendMessage("hosts")
       hosts = self.client.receiveMessage()
-      print(hosts)
       
       if len(hosts) == 0:
         print("\nNo hosts available. Host a game? (y/n): ")
