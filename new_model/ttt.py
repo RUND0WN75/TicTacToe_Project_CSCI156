@@ -447,7 +447,6 @@ class Game:
     elif selection == "2":
       self.client.sendMessage("hosts")
       hosts = self.client.receiveMessage()
-      print(hosts)
       
       if len(hosts) == 0:
         print("\nNo hosts available. Host a game? (y/n): ")
@@ -465,13 +464,13 @@ class Game:
               print("Player 2 has connected!")
               self.client.sendMessage("host_active")
               # response = self.client.receiveMessage()
-              if response == "accepted":
-                self.game = TicTacToe()
-                self.game.hostGame(self.addr[0], self.p2pPort, self.client.handle)
-                
-                while not self.game.gameOver:
-                  pass
-                
+              # if response == "accepted":
+              self.game = TicTacToe()
+              self.game.hostGame(self.addr[0], self.p2pPort, self.client.handle)
+              
+              while not self.game.gameOver:
+                pass
+              
               print("\nGame over. Returning to game menu...\n")
               self.onlineMenu()
         else:

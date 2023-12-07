@@ -223,7 +223,7 @@ class Server:
         if (len(self.p2pHosts) > 0):
           handle = self.getClientByAddr(client_address)[2]
           matching_hosts = self.getP2PHostByHandle(handle)
-          if len(matching_hosts) <= 0:
+          if not matching_hosts or matching_hosts == None:
             self.p2pHosts.append((handle, (client_address[0], port)))
         else:
           handle = self.getClientByAddr(client_address)[2]
@@ -276,5 +276,5 @@ class Server:
         self.server.close()
         
 if __name__ == "__main__":
-  server = Server("10.0.0.24")
+  server = Server("129.8.221.148")
   server.run()
