@@ -82,9 +82,9 @@ class TicTacToe:
   
 
 class Server:
-  def __init__(self):
-    self.ip_address = "localhost"
-    self.port = 5500
+  def __init__(self, ip_address="localhost", port=3333):
+    self.ip_address = ip_address
+    self.port = 3333
     self.server = None
     self.clients = []
     self.p2pHosts = [] #[(handle, (ip, port)), ...]
@@ -275,5 +275,5 @@ class Server:
         self.server.close()
         
 if __name__ == "__main__":
-  server = Server()
+  server = Server("10.0.0.24")
   server.run()

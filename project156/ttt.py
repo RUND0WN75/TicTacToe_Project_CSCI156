@@ -12,7 +12,7 @@ import sys
 class Client:
   def __init__(self, host):
     self.host = host
-    self.port = 5500
+    self.port = 3333
     self.connected = False
     self.client = None
     self.addr = None
@@ -46,6 +46,7 @@ class Client:
       try:
         self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.client.connect((self.host, self.port))
+        print(self.client)
         response = self.receiveMessage()
         if response == "connected":
           self.connected = True
