@@ -112,10 +112,12 @@ class Server:
     except Exception as e:
         print(f"Error when hanlding client: {e}")
     finally:
-        clientHandle = self.getClientByAddr(client_address)[2]
-        self.clients.remove((client_socket, client_address, clientHandle))
-        client_socket.close()
-        print(f"Connection to client ({client_address[0]}:{client_address[1]}) closed")
+        client = self.getClientByAddr(client_address)
+        if client:
+          clientHandle = self.getClientByAddr(client_address)[2]
+          self.clients.remove((client_socket, client_address, clientHandle))
+          client_socket.close()
+          print(f"Connection to client ({client_address[0]}:{client_address[1]}) closed")
     
   def handleTaken(self, handle):
     for client in self.clients:
