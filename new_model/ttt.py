@@ -9,10 +9,11 @@ import sys
 class Client:
   def __init__(self, host):
     self.host = host
-    self.port = 5500
+    self.port = 3333
     self.connected = False
     self.client = None
     self.addr = None
+    self.handle = None
     
     self.connect()
     
@@ -359,6 +360,7 @@ class Game:
       response = self.client.receiveMessage()
       
       if response == "accepted":
+        self.client.handle = handle
         print("\nConnected as " + handle)
         self.onlineMenu()
         
@@ -434,7 +436,7 @@ class Game:
           print("Player 2 has connected!")
           self.client.sendMessage("host_active")
           self.game = TicTacToe()
-          self.game.hostGame(self.client.addr[0], self.p2pPort)
+          self.game.hostGame(self.client.addr[0], self.p2pPort, self.client.handle)
           
           while not self.game.gameOver:
             pass
@@ -465,7 +467,7 @@ class Game:
               # response = self.client.receiveMessage()
               if response == "accepted":
                 self.game = TicTacToe()
-                self.game.hostGame(self.addr[0], self.p2pPort)
+                self.game.hostGame(self.addr[0], self.p2pPort, self.client.handle)
                 
                 while not self.game.gameOver:
                   pass
@@ -496,7 +498,7 @@ class Game:
               waiting = False
               print("Connected to host!")
               self.game = TicTacToe()
-              self.game.connectGame(selectedHost[1][0], int(selectedHost[1][1]))
+              self.game.connectGame(selectedHost[1][0], int(selectedHost[1][1]), self.client.handle)
               
               while not self.game.gameOver:
                 pass

@@ -6,6 +6,20 @@ import pygame
 import sys
 
 
+Width = 500
+Height = 500
+Cell = Width // 3
+
+
+White = (255, 255, 255)
+Lines = (0,0,0)
+
+pygame.init()
+    
+screen = pygame.display.set_mode((Width, Height))
+pygame.display.set_caption("Tic Tac Toe CSCI 156 Group 4")
+font = pygame.font.Font(pygame.font.get_default_font(), 20)
+screen.fill(White)
 
 # Class to represent a client that has the pattern of send message
 # and receive message in the same order
@@ -68,13 +82,7 @@ class TicTacToe:
     self.winner = None
     self.gamePlay = None
     self.gameOver = False
-    self.Width = 500
-    self.Height = 500
-    self.Cell = self.Width // 3
     self.delay = 500
-
-    self.White = (255, 255, 255)
-    self.Lines = (0,0,0)
     
     self.counter = 0
     
@@ -131,7 +139,6 @@ class TicTacToe:
   def handleConnect(self, client):
     self.displayBoardGUI(self.board, f"Connected to opponent. Game starting...", self.delay)
     while not self.gameOver:
-      pygame.display.update()
       if self.turn == self.you:
         self.displayBoardGUI(self.board, f"Your turn, {self.player1}", self.delay)
         for event in pygame.event.get():
@@ -144,26 +151,25 @@ class TicTacToe:
               client.send(f"move::{str(move)}".encode("utf-8"))
               self.makeMove(move)
               self.turn = self.players[1]
-        
-        self.displayBoardGUI(self.board, f"Waiting for {self.player2}...", self.delay)
+        pygame.display.update()
       else:
-        waiting = True
-        while waiting:
-          try:
-            data = client.recv(1024)
-          except Exception as e:
-            print(f"Error: {e}")
-            client.close()
-            break
-          if not data:
-            client.close()
-            break
-          else:
-            move = eval(data.decode("utf-8").split("::")[1])
-            waiting = False
-            self.makeMove(move, self.opponent)
-            self.displayBoardGUI(self.board, f"{self.player2} moved:", self.delay)
-            self.turn = self.players[0]
+        self.displayBoardGUI(self.board, f"Waiting for {self.player2}...", self.delay)
+        try:
+          data = client.recv(1024)
+          print(data.decode("utf-8"))
+        except Exception as e:
+          print(f"Error: {e}")
+          client.close()
+          break
+        if not data:
+          client.close()
+          break
+        else:
+          move = eval(data.decode("utf-8").split("::")[1])
+          self.makeMove(move, self.opponent)
+          self.displayBoardGUI(self.board, f"{self.player2} moved:", self.delay)
+          pygame.display.update()
+          self.turn = self.players[0]
           
     try:    
       client.close()
@@ -360,28 +366,23 @@ class TicTacToe:
         print("----------")
 
   def displayBoardGUI(self, board, message = None, delay = None):
-    pygame.init()
     
-    screen = pygame.display.set_mode((self.Width, self.Height))
-    pygame.display.set_caption("Tic Tac Toe CSCI 156 Group 4")
-    font = pygame.font.Font(pygame.font.get_default_font(), 20)
-    screen.fill(self.White)
 
     for i in range(1, 4):
-        pygame.draw.line(screen, self.Lines, (i * self.Cell, 0), (i * self.Cell, self.Height), 2)
-        pygame.draw.line(screen, self.Lines, (0, i* self.Cell), (self.Width, i *self. Cell), 2)
+        pygame.draw.line(screen, Lines, (i * Cell, 0), (i * Cell, Height), 2)
+        pygame.draw.line(screen, Lines, (0, i* Cell), (Width, i * Cell), 2)
 
     for i in range(3):
         for j in range(3):
             if board[i][j] == "X":
-                pygame.draw.line(screen, self.Lines, (j * self.Cell, i * self.Cell), ((j + 1) * self.Cell, (i + 1) * self.Cell), 2)
-                pygame.draw.line(screen, self.Lines, ((j + 1) * self.Cell, i * self.Cell), (j * self.Cell, (i + 1) * self.Cell), 2)
+                pygame.draw.line(screen, Lines, (j * Cell, i * Cell), ((j + 1) * Cell, (i + 1) * Cell), 2)
+                pygame.draw.line(screen, Lines, ((j + 1) * Cell, i * Cell), (j * Cell, (i + 1) * Cell), 2)
             elif board[i][j] == "O":
-                pygame.draw.circle(screen, self.Lines, (j * self.Cell + self.Cell // 2, i * self.Cell + self.Cell // 2), self.Cell // 2 - 2, 2)
+                pygame.draw.circle(screen, Lines, (j * Cell + Cell // 2, i * Cell + Cell // 2), Cell // 2 - 2, 2)
 
     if message:
-        sentence = font.render(message, True, self.Lines)
-        alignment = sentence.get_rect(center = (self.Width //2, self.Height // 10))
+        sentence = font.render(message, True, Lines)
+        alignment = sentence.get_rect(center = (Width //2, Height // 10))
         screen.blit(sentence, alignment)
     
     pygame.display.flip()
@@ -392,8 +393,8 @@ class TicTacToe:
         pygame.time.delay(0)
 
   def player_input(self, board, mouseX, mouseY):
-    row = mouseY // self.Cell
-    col = mouseX // self.Cell
+    row = mouseY // Cell
+    col = mouseX // Cell
 
     # Check that the cell is not already in use
     if board[row][col] == 0:
