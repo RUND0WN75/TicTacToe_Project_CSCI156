@@ -146,22 +146,24 @@ class TicTacToe:
         pygame.display.update()
       else:
         self.displayBoardGUI(self.board, f"Waiting for {self.player2}...", self.delay)
-        try:
-          data = client.recv(1024)
-          print(data.decode("utf-8"))
-        except Exception as e:
-          print(f"Error: {e}")
-          client.close()
-          break
-        if not data:
-          client.close()
-          break
-        else:
-          move = eval(data.decode("utf-8").split("::")[1])
-          self.makeMove(move, self.opponent)
-          self.displayBoardGUI(self.board, f"{self.player2} moved:", self.delay)
-          pygame.display.update()
-          self.turn = self.players[0]
+        waiting = True
+        while waiting:
+          try:
+            data = client.recv(1024)
+          except Exception as e:
+            print(f"Error: {e}")
+            client.close()
+            break
+          if not data:
+            client.close()
+            break
+          else:
+            move = eval(data.decode("utf-8").split("::")[1])
+            waiting = False
+            self.makeMove(move, self.opponent)
+            self.displayBoardGUI(self.board, f"{self.player2} moved:", self.delay)
+            pygame.display.update()
+            self.turn = self.players[0]
           
     try:    
       client.close()
