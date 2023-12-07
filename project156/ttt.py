@@ -131,6 +131,7 @@ class TicTacToe:
   def handleConnect(self, client):
     self.displayBoardGUI(self.board, f"Connected to opponent. Game starting...", self.delay)
     while not self.gameOver:
+      pygame.display.update()
       if self.turn == self.you:
         self.displayBoardGUI(self.board, f"Your turn, {self.player1}", self.delay)
         for event in pygame.event.get():
@@ -143,9 +144,9 @@ class TicTacToe:
               client.send(f"move::{str(move)}".encode("utf-8"))
               self.makeMove(move)
               self.turn = self.players[1]
-        pygame.display.update()
-      else:
+        
         self.displayBoardGUI(self.board, f"Waiting for {self.player2}...", self.delay)
+      else:
         waiting = True
         while waiting:
           try:
@@ -162,7 +163,6 @@ class TicTacToe:
             waiting = False
             self.makeMove(move, self.opponent)
             self.displayBoardGUI(self.board, f"{self.player2} moved:", self.delay)
-            pygame.display.update()
             self.turn = self.players[0]
           
     try:    
